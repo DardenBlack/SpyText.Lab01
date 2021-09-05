@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SpyText.Лабораторная робота №1</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <style>
+        body {
+            padding: 10px 10px 0;
+        }
+        .plain_text__input {
+            resize: none;
+
+            height: 27vh !important;
+        }
+
+        .all_words__area {
+            resize: none;
+
+            height: 23vh !important;
+        }
+
+        .dictionary_words__area {
+            resize: none;
+
+            height: 23vh !important;
+        }
+
+        @media screen and (min-width: 768px) {
+            body {
+                padding: 10px 25% 0 25%;
+            }
+        }
+    </style>
+
+</head>
+<body>
+<header class="d-flex justify-content-around align-items-center">
+    <input type="file" id='file' class="file form-control w-50">
+    <button class="open_plainText__button btn btn-primary">Открыть текст</button>
+</header>
+<hr style="border: 1px solid grey; width: 100%; margin: revert">
+<main>
+    <!-- Modal -->
+    <div class="modal fade" id="analyzeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Результат анализа</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---->
+    <div class="full_text__container form-floating d-flex flex-column">
+        <textarea class="plain_text__input form-control" id="plain_text__input" readonly></textarea>
+        <label for="plain_text__input">Текст для анализа</label>
+        <button class="choose_words__button btn btn-primary mt-1 w-50 align-self-center">Выделить слова</button>
+    </div>
+    <div class="button_group__container">
+        <hr style="border: 1px solid grey; width: 100%; margin: revert">
+        <div class="dictionary__button-group d-flex justify-content-around">
+            <input type="file" class="dictionary form-control w-50">
+            <button class="open_dictionary__button btn btn-primary">Подключить словарь</button>
+        </div>
+    </div>
+    <div class="text_item__container d-flex justify-content-between">
+        <div class="form-floating w-50 m-2">
+            <textarea class="all_words__area form-control" id="all_words__area" readonly></textarea>
+            <label for="all_words__area">Все слова текста</label>
+        </div>
+        <div class="form-floating w-50 m-2">
+            <textarea class="dictionary_words__area form-control" id="dictionary_words__area" readonly></textarea>
+            <label for="dictionary_words__area">Ключевые слова в словаре</label>
+        </div>
+    </div>
+    <div class="word_number__container">
+        <p class="word_number">Слов в тексте: </p>
+    </div>
+    <div class="analyze_button__container d-flex justify-content-center">
+        <button class="analyze__button btn btn-primary w-50"
+                data-bs-toggle="modal"
+                data-bs-target="#analyzeModal">
+            Анализировать
+        </button>
+    </div>
+</main>
+<footer>
+    <div class="copyright text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        © 2021 Лабораторная работа №1
+        <p>
+            Студент группы КБ-2 Яворенко Богдан
+        </p>
+    </div>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
+        integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
+        crossorigin="anonymous"></script>
+<!--Исполняемый скрипт-->
+<script>
+   /*Убрать label при scroll*/
+   function hideLabel (element, label) {
+       document.querySelector(element).addEventListener('scroll', function () {
+           if (document.querySelector(element).scrollTop > 10) {
+               document.querySelector(label).style.visibility = 'hidden'
+           } else {
+               document.querySelector(label).style.visibility = 'visible'
+           }
+       })
+   }
+
+   hideLabel('.all_words__area', '.all_words__area + label')
+   hideLabel('.dictionary_words__area', '.dictionary_words__area + label')
+   hideLabel('.plain_text__input', '.plain_text__input + label')
+
+
+
+   /*---*/
+
+    document.querySelector('.open_plainText__button').addEventListener('click', function () {
+        plainText = document.querySelector('.file').files[0];
+        plainTextReader = new FileReader();
+        plainTextReader.readAsText(plainText);
+
+        plainTextReader.onload = function () {
+            document.querySelector('.plain_text__input').value = plainTextReader.result
+        }
+        plainTextReader.onerror = function () {
+            console.log(plainTextReader.error)
+        }
+    })
+
+    document.querySelector('.choose_words__button').addEventListener('click', function () {
+        document.querySelector('.all_words__area').value = plainTextReader.result.replace(/[.,%]/g, '').split(' ').join('\n');
+        document.querySelector('.word_number').innerHTML = `Слов в тексте: ${plainTextReader.result.split(' ').length}`;
+    })
+
+    document.querySelector('.open_dictionary__button').addEventListener('click', function () {
+        dictionary = document.querySelector('.dictionary').files[0];
+        dictionaryReader = new FileReader();
+        dictionaryReader.readAsText(dictionary);
+
+        dictionaryReader.onload = function () {
+            dictionaryWords = dictionaryReader.result.split(' ')
+            document.querySelector('.dictionary_words__area').value = dictionaryReader.result.replace(/[.,%]/g, '').split(' ').join('\n');
+        }
+    })
+
+    document.querySelector('.analyze__button').addEventListener('click', function () {
+        let allWords = document.querySelector('.all_words__area').value.split('\n');
+        let dictWords = document.querySelector('.dictionary_words__area').value.split('\n');
+        analyzeModal = document.querySelector('.modal-body')
+
+        let res = [];
+
+        if (allWords[0] === '') {
+            analyzeModal.innerHTML = 'Не выбран текст для анализа, либо не выбраны слова!'
+        } else if (dictWords[0] === '') {
+            analyzeModal.innerHTML = 'Нету слов для сравнения, добавьте словарь!'
+        } else {
+            for (let i of allWords) {
+                if (dictWords.includes(i)) {
+                    res.push(i)
+                }
+            }
+
+            analyze()
+        }
+
+        function analyze() {
+            let percent = Math.round(res.length * 100 / allWords.length)
+
+            if (percent >= 0 && percent < 5) {
+                analyzeModal.innerHTML = `Слов с повышенным уровнем опасности - ${percent}%, - текст безопасный, маловажный!`
+            } else if (percent > 5 && percent < 15) {
+                analyzeModal.innerHTML = `Слов с повышенным уровнем опасности - ${percent}%, - текст средней важности!`
+            } else if (percent > 15 && percent < 30) {
+                analyzeModal.innerHTML = `Слов с повышенным уровнем опасности - ${percent}%, - текст важный!`
+            } else if (percent > 30 && percent <= 100) {
+                analyzeModal.innerHTML = `Слов с повышенным уровнем опасности - ${percent}%, - текст очень важный, большое количество конфиденциальных данных!`
+            }
+        }
+    })
+
+</script>
+</body>
+</html>
